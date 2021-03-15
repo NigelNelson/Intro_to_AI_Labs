@@ -58,13 +58,17 @@ class Rat:
         """ This function returns a list of the names of the rooms from the
         start_location to the target_location. """
         room_names = []
-        for room in self.recursive_dfs_search(target_location, self._start_location, []):
-            if room != None:
+        rooms = self.dfs_search(target_location)
+        if rooms != [None]:
+            for room in rooms:
                 room_names.append(room.name)
         return room_names
 
     def dfs_search(self, target_location: Room):
-        print("maybe implement")
+        rooms = self.recursive_dfs_search(target_location, self._start_location, [])
+        if rooms[-1] != target_location:
+            rooms = [None]
+        return rooms
 
     def recursive_dfs_search(self, target_location: Room, current_location: Room, visited: List[Room]):
         if self._self_rooms_searched:
@@ -74,8 +78,14 @@ class Rat:
             if neighbor == target_location:
                 visited.append(neighbor)
                 return visited
-            elif neighbor not in visited:
-                return self.recursive_dfs_search(target_location, neighbor, visited.copy())
+            elif neighbor not in visited and not None:
+                visited = self.recursive_dfs_search(target_location, neighbor, visited.copy())
+                if visited is not None and visited[-1] == target_location:
+                    return visited
+                elif visited is not None:
+                    visited.remove(neighbor)
+
+        return visited
 
 
 
