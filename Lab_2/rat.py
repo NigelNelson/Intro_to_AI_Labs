@@ -75,15 +75,16 @@ class Rat:
             print(current_location.name)
         visited.append(current_location)
         for neighbor in current_location.neighbors():
-            if neighbor == target_location:
-                visited.append(neighbor)
-                return visited
-            elif neighbor not in visited and not None:
-                visited = self.recursive_dfs_search(target_location, neighbor, visited.copy())
-                if visited is not None and visited[-1] == target_location:
+            if neighbor is not None:
+                if neighbor == target_location:
+                    visited.append(neighbor)
                     return visited
-                elif visited is not None:
-                    visited.remove(neighbor)
+                elif neighbor not in visited:
+                    visited = self.recursive_dfs_search(target_location, neighbor, visited.copy())
+                    if visited[-1] == target_location and visited is not None:
+                        return visited
+                    elif visited is not None:
+                        visited.remove(neighbor)
 
         return visited
 
