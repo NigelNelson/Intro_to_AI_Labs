@@ -30,34 +30,52 @@ class Rat:
         start_location (Room): identifier for current location of the rat
     """
 
-
     def __init__(self, dungeon: Dungeon, start_location: Room):
         """ This constructor stores the references when the Rat is 
         initialized. """
-        self.dungeon = dungeon
-        self.start_location = start_location
+        self._dungeon = dungeon
+        self._start_location = start_location
+        self._self_rooms_searched = False
 
     @property
     def dungeon(self) -> Dungeon:
         """ This function returns a reference to the dungeon.  """
-        print("fixme")
-        return
+        return self._dungeon
 
     def set_echo_rooms_searched(self) -> None:
         """ The _self_rooms_searched variable is used as a flag for whether
         the rat should display rooms as they are visited. """
-        print("fixme")
+        self._self_rooms_searched = True
 
     def path_to(self, target_location: Room) -> List[Room]:
         """ This function finds and returns a list of rooms from 
         start_location to target_location.  The list will include
         both the start and destination, and if there isn't a path
         the list will be empty. This function uses depth first search. """
-        print("fixme")
-        return []
+        return self.recursive_dfs_search(target_location, self._start_location, [])
 
     def directions_to(self, target_location: Room) -> List[str]:
         """ This function returns a list of the names of the rooms from the
         start_location to the target_location. """
-        print("fixme")
-        return []
+        room_names = []
+        for room in self.recursive_dfs_search(target_location, self._start_location, []):
+            if room != None:
+                room_names.append(room.name)
+        return room_names
+
+    def dfs_search(self, target_location: Room):
+        print("maybe implement")
+
+    def recursive_dfs_search(self, target_location: Room, current_location: Room, visited: List[Room]):
+        if self._self_rooms_searched:
+            print(current_location.name)
+        visited.append(current_location)
+        for neighbor in current_location.neighbors():
+            if neighbor == target_location:
+                visited.append(neighbor)
+                return visited
+            elif neighbor not in visited:
+                return self.recursive_dfs_search(target_location, neighbor, visited.copy())
+
+
+
