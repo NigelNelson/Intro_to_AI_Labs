@@ -18,7 +18,9 @@
 # enforced by Python.  
 #
 
-from dungeon import Dungeon, Room, Direction
+from dungeon import Dungeon
+from dungeon import Room
+from dungeon import Direction
 from typing import *
 
 
