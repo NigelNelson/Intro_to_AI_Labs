@@ -57,51 +57,51 @@ class Rat:
         start_location to target_location.  The list will include
         both the start and destination, and if there isn't a path
         the list will be empty. This function uses depth first search. """
-        return self.dfs_search(target_location)
+        return self.__dfs_search(target_location)
 
     def directions_to(self, target_location: Room) -> List[str]:
         """ This function returns a list of the names of the rooms from the
         start_location to the target_location. """
         room_names = []
-        rooms = self.dfs_search(target_location)
+        rooms = self.__dfs_search(target_location)
         if rooms != [None]:
             for room in rooms:
                 room_names.append(room.name)
         return room_names
 
-    def dfs_search(self, target_location: Room):
+    def __dfs_search(self, target_location: Room):
         """ This function returns the list of rooms to a given target location,
         and if the returned list doesn't have the desired target room at the
         end, then an empty list is returned"""
-        rooms = self.recursive_dfs_search(target_location,
+        rooms = self.__recursive_dfs_search(target_location,
                                           self._start_location, [])
         if rooms[-1] != target_location:
             rooms = [None]
         return rooms
 
-    def optional_echo(self, visited_room: Room):
+    def __optional_echo(self, visited_room: Room):
         """ This function is called in order to check if _self_rooms_searched
         is True, and if so, prints that it has visited the specified room
         the rooms that it """
         if self._self_rooms_searched:
             print("Visiting:",visited_room.name)
 
-    def recursive_dfs_search(self, target_location: Room,
+    def __recursive_dfs_search(self, target_location: Room,
                              current_location: Room, visited: List[Room]):
         """ Recursive depth first search of rooms, which searches all rooms
         in a dungeon. However, in order to be recursive it must always
         return something, as such, its sometimes returns a list of rooms
         that doesn't contain the target"""
-        self.optional_echo(current_location)
+        self.__optional_echo(current_location)
         visited.append(current_location)
         for neighbor in current_location.neighbors():
             if neighbor is not None:
                 if neighbor == target_location:
-                    self.optional_echo(neighbor)
+                    self.__optional_echo(neighbor)
                     visited.append(neighbor)
                     return visited
                 elif neighbor not in visited:
-                    visited = self.recursive_dfs_search(
+                    visited = self.__recursive_dfs_search(
                         target_location, neighbor, visited.copy())
                     if visited is not None and visited[-1] == target_location:
                         return visited
