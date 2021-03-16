@@ -79,19 +79,25 @@ class Rat:
             rooms = [None]
         return rooms
 
+    def optional_echo(self, visited_room: Room):
+        """ This function is called in order to check if _self_rooms_searched
+        is True, and if so, prints that it has visited the specified room
+        the rooms that it """
+        if self._self_rooms_searched:
+            print("Visiting:", visited_room.name)
+
     def recursive_dfs_search(self, target_location: Room,
                              current_location: Room, visited: List[Room]):
         """ Recursive depth first search of rooms, which searches all rooms
         in a dungeon. However, in order to be recursive it must always
         return something, as such, its sometimes returns a list of rooms
         that doesn't contain the target"""
-        if self._self_rooms_searched:
-            print("Visiting:", current_location.name)
+        self.optional_echo(current_location)
         visited.append(current_location)
         for neighbor in current_location.neighbors():
             if neighbor is not None:
                 if neighbor == target_location:
-                    print("Visiting:", current_location.name)
+                    self.optional_echo(neighbor)
                     visited.append(neighbor)
                     return visited
                 elif neighbor not in visited:
