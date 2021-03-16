@@ -31,6 +31,14 @@ def rat_in_three_room_dungeon() -> Rat:
     return rat
 
 
+def rat_in_none_dungeon() -> Rat:
+    """Returns a Rat object in a Dungeon that doesn't have anything more than a main room"""
+    room_1 = Room('main room')
+    d = Dungeon(room_1)
+    rat = Rat(d, room_1)
+    return rat
+
+
 def test_rat_1(debug: bool = False) -> str:
     """Test a rat going from the start to the end of the rat/dungeon constructed
     by rat_in_three_room_dungeon. When debug is true, makes the rat echo rooms
@@ -265,6 +273,18 @@ def test_rat_7(debug: bool = False) -> str:
     assert len(path) > 19 and path[-1] == '19,19'
     return str(path)
 
+def test_rat_8(debug: bool = False) -> str:
+    """Test a rat traveling from 0,0 to 19,19. When debug is true, makes the rat
+    echo rooms as they are searched.
+    """
+    rat = rat_in_none_dungeon()
+    if debug:
+        rat.set_echo_rooms_searched()
+    path = rat.directions_to(Room("Imaginary Room"))
+    print(path)
+    assert len(path) == 0
+    return str(path)
+
 
 def run_all(debug: bool = False) -> None:
     """Runs all test cases. When debug is true, makes the rat echo rooms as they
@@ -277,6 +297,7 @@ def run_all(debug: bool = False) -> None:
     test_rat_5(debug)
     test_rat_6(debug)
     test_rat_7(debug)
+    test_rat_8(debug)
     print("All tests pass.")
 
 
@@ -304,6 +325,7 @@ def main() -> int:
         result = test_rat_6(debug)
     elif n == 7:
         result = test_rat_7(debug)
+
     else:
         print("Error: unrecognized test number " + str(n))
     print("Test passes with result " + str(result))

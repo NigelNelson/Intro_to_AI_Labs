@@ -9,8 +9,9 @@
 # Stub class for Lab 2 
 # This class creates a Rat agent to be used to explore a Dungeon
 # 
-# Note: Instance variables with a single preceeding underscore are intended 
-# to be protected, so setters and getters are included to enable this convention.
+# Note: Instance variables with a single proceeding underscore are intended
+# to be protected, so setters and getters are included to enable this
+# convention.
 #
 # Note: The -> notation in the function definition line is a type hint.  This 
 # will make identifying the appropriate return type easier, but they are not 
@@ -28,6 +29,8 @@ class Rat:
     Attributes:
         dungeon (Dungeon): identifier for the dungeon to be explored
         start_location (Room): identifier for current location of the rat
+        self_rooms_searched (Boolean): flag used to indicate
+        whether or not to print the visited rooms
     """
 
     def __init__(self, dungeon: Dungeon, start_location: Room):
@@ -52,7 +55,7 @@ class Rat:
         start_location to target_location.  The list will include
         both the start and destination, and if there isn't a path
         the list will be empty. This function uses depth first search. """
-        return self.recursive_dfs_search(target_location, self._start_location, [])
+        return self.dfs_search(target_location)
 
     def directions_to(self, target_location: Room) -> List[str]:
         """ This function returns a list of the names of the rooms from the
@@ -65,12 +68,21 @@ class Rat:
         return room_names
 
     def dfs_search(self, target_location: Room):
-        rooms = self.recursive_dfs_search(target_location, self._start_location, [])
+        """ This function returns the list of rooms to a given target location,
+        and if the returned list doesn't have the desired target room at the
+        end, then an empty list is returned"""
+        rooms = self.recursive_dfs_search(target_location,
+                                          self._start_location, [])
         if rooms[-1] != target_location:
             rooms = [None]
         return rooms
 
-    def recursive_dfs_search(self, target_location: Room, current_location: Room, visited: List[Room]):
+    def recursive_dfs_search(self, target_location: Room,
+                             current_location: Room, visited: List[Room]):
+        """ Recursive depth first search of rooms, which searches all rooms
+        in a dungeon. However, in order to be recursive it must always
+        return something, as such, its sometimes returns a list of rooms
+        that doesn't contain the target"""
         if self._self_rooms_searched:
             print(current_location.name)
         visited.append(current_location)
@@ -80,13 +92,10 @@ class Rat:
                     visited.append(neighbor)
                     return visited
                 elif neighbor not in visited:
-                    visited = self.recursive_dfs_search(target_location, neighbor, visited.copy())
-                    if visited[-1] == target_location and visited is not None:
+                    visited = self.recursive_dfs_search(
+                        target_location, neighbor, visited.copy())
+                    if visited is not None and visited[-1] == target_location:
                         return visited
                     elif visited is not None:
-                        visited.remove(neighbor)
-
+                        visited.pop()
         return visited
-
-
-
