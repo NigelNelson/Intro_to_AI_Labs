@@ -86,7 +86,7 @@ class Rat:
         return something, as such, its sometimes returns a list of rooms
         that doesn't contain the target"""
         if self._self_rooms_searched:
-            print(current_location.name)
+            print("Visiting: ", current_location.name)
         visited.append(current_location)
         for neighbor in current_location.neighbors():
             if neighbor is not None:
