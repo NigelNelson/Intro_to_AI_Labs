@@ -84,7 +84,7 @@ class Rat:
         is True, and if so, prints that it has visited the specified room
         the rooms that it """
         if self._self_rooms_searched:
-            print("Visiting:", visited_room.name)
+            print("Visiting:",visited_room.name)
 
     def recursive_dfs_search(self, target_location: Room,
                              current_location: Room, visited: List[Room]):
