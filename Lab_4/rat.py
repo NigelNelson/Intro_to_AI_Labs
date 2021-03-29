@@ -23,7 +23,6 @@
 from dungeon import Dungeon
 from dungeon import Room
 from typing import *
-import heapq
 
 
 class Rat:
@@ -202,23 +201,43 @@ class Rat:
             is_searchable = True
         return visited, is_searchable
 
-    def __astar_search(self, target_location: Room) -> List[Room]:
-        None
+    # def __astar_search(self, target_location: Room) -> List[Room]:
+    #     None
 
     def astar_directions_to(self, target_location: Room) -> List[str]:
         """Return the list of rooms names from the rat's current location to
          the target location. Uses A* search."""
+        room_names = []
+        rooms = self.astar_path_to(target_location)
+        if rooms != [None]:
+            for room in rooms:
+                room_names.append(room.name)
+        return room_names
+
+    def __to_list_item(self, specified_room: Room,
+                       target_location: Room, cost: int) -> Tuple[
+         Room, Tuple[str, int, int]]:
+        room_tuple = (specified_room,
+                      (specified_room.name, cost,
+                       specified_room.estimated_cost_to(target_location)))
+        return room_tuple
+
+    def __astar_sort(self, elem: Tuple[Room, Tuple[str, int, int]]):
+        return elem[1][1] + elem[1][2]
+
 
     def astar_path_to(self, target_location: Room) -> List[Room]:
         """Returns the list of rooms from the start location to the target
          location, using A* search to find the path."""
-        frontier = [self._start_location]
-        heapq.heapify(frontier)
-
+        frontier = [self.__to_list_item(self._start_location, target_location,
+                                        0)]
         explored = set()
         room_map = {}
         while frontier:
-            current_room = frontier.pop(0)
+            frontier.sort(key=self.__astar_sort)
+            current_room_elem = frontier.pop(0)
+            current_room = current_room_elem[0]
+            current_cost = current_room_elem[1][1]
             explored.add(current_room)
             self.__optional_echo(current_room)
             if current_room is target_location:
@@ -231,7 +250,10 @@ class Rat:
             else:
                 for room in current_room.neighbors():
                     if room not in explored:
-                        frontier.append(room)
+                        frontier.append(
+                            self.__to_list_item(room,
+                                                target_location,
+                                                current_cost + 1))
                         explored.add(room)
                         room_map[room] = current_room
         return []
