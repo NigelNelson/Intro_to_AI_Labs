@@ -23,6 +23,7 @@
 from dungeon import Dungeon
 from dungeon import Room
 from typing import *
+import heapq
 
 
 class Rat:
@@ -200,3 +201,41 @@ class Rat:
         else:
             is_searchable = True
         return visited, is_searchable
+
+    def __astar_search(self, target_location: Room) -> List[Room]:
+        None
+
+    def astar_directions_to(self, target_location: Room) -> List[str]:
+        """Return the list of rooms names from the rat's current location to
+         the target location. Uses A* search."""
+
+    def astar_path_to(self, target_location: Room) -> List[Room]:
+        """Returns the list of rooms from the start location to the target
+         location, using A* search to find the path."""
+        frontier = [self._start_location]
+        heapq.heapify(frontier)
+
+        explored = set()
+        room_map = {}
+        while frontier:
+            current_room = frontier.pop(0)
+            explored.add(current_room)
+            self.__optional_echo(current_room)
+            if current_room is target_location:
+                path = [current_room]
+                while current_room is not self._start_location:
+                    path.append(room_map[current_room])
+                    current_room = room_map[current_room]
+                path.reverse()
+                return path
+            else:
+                for room in current_room.neighbors():
+                    if room not in explored:
+                        frontier.append(room)
+                        explored.add(room)
+                        room_map[room] = current_room
+        return []
+
+    def rooms_visited_by_last_search(self) -> List[str]:
+        """Return the current list of rooms visited (in any order). This is
+         used by Esubmit to validate the current rooms visited. """
