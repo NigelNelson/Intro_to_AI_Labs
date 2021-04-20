@@ -44,21 +44,31 @@ class NeuralNetwork:
         requires two vectors of x and y values as the input and output data.
         """
         # FIXME week 7
+        print("input shape is", x.shape)
         self._a_1 = x
-        self._weights_2 = np.array([[3.07153357, 2.01940447, -2.14695621,
-                                     2.62044111],
-                                    [2.83203743, 2.15003442, -2.16855273,
-                                     2.77165525]])
-        self._weights_3 = np.array([[3.8124126],
-                                    [1.92454886],
-                                    [-5.20663292],
-                                    [3.21598943]])
-        self._biases_2 = np.array([-1.26285168, -0.72768134, 0.89760201,
-                                   -1.10572122])
-        self._biases_3 = np.array([-2.1110666])
+        self._weights_2 = np.random.rand(x.shape[1], num_hidden_neurons)
+
+        # self._weights_2 = np.array([[3.07153357, 2.01940447, -2.14695621,
+        #                              2.62044111],
+        #                             [2.83203743, 2.15003442, -2.16855273,
+        #                              2.77165525]])
+        self._weights_3 = np.random.rand(num_hidden_neurons, 1)
+        # self._weights_3 = np.array([[3.8124126],
+        #                             [1.92454886],
+        #                             [-5.20663292],
+        #                             [3.21598943]])
+        self._biases_2 = np.random.rand(num_hidden_neurons)
+        # self._biases_2 = np.array([-1.26285168, -0.72768134, 0.89760201,
+        #                            -1.10572122])
+        self._biases_3 = np.random.rand(1)
+        # self._biases_3 = np.array([-2.1110666])
         self._y = y
         self._output = np.zeros(self._y.shape)
         self._learning_rate = lr
+        self._z_l2_values = np.zeros((x.shape[0], num_hidden_neurons))
+        self._a_l2_values = np.zeros((x.shape[0], num_hidden_neurons))
+        self._z_l3_values = np.zeros((x.shape[0], 1))
+        # self._a_l2_values = np.zeros(x.shape[0], 1)
 
     def load_4_layer_ttt_network(self):
         self._weights_2 = np.array([[-3.12064667, -0.62044264, -3.18868069,
@@ -91,10 +101,12 @@ class NeuralNetwork:
         """
         Uses sigmoid activation function applied to the input * weights + bias
         """
-        hidden_layer = sigmoid(np.dot(self._a_1, self._weights_2) +
-                               self._biases_2)
-        return sigmoid(np.dot(hidden_layer, self._weights_3) +
-                       self._biases_3)
+
+        self._z_l2_values = np.dot(self._a_1, self._weights_2) + self._biases_2
+        self._a_l2_values = sigmoid(self._z_l2_values)
+        self._z_l3_values = np.dot(self._a_l2_values,
+                                   self._weights_3) + self._biases_3
+        return sigmoid(self._z_l3_values)
 
     def feedforward(self):
         """
@@ -114,7 +126,34 @@ class NeuralNetwork:
         """
         Update model weights based on the error between the most recent
         predictions (feedforward) and the training values.
+        DL/DB only needs to be calculated for layers. dldw is matrix, dl/db is array
+        store z and a values
         """
+        error_l3 = np.multiply((self._output - self._y),
+                               sigmoid_derivative(self._z_l3_values))
+        error_l2 = np.multiply(
+            np.dot(np.transpose(self._weights_3), error_l3),
+            sigmoid_derivative(self._z_l2_values))
+
+        print("error l3 shape:", error_l3.shape)
+        print("error l2 shape:", error_l2.shape)
+
+        bias_change_error_l3 = error_l3
+        bias_change_error_l2 = error_l2
+
+        print("l3  a shape:", self._a_l2_values.shape)
+        print("input  a shape:", self._a_1.shape)
+
+        weight_change_error_l3 = np.dot(self._a_l2_values, error_l3)
+        weight_change_error_l2 = np.dot(self._a_1, error_l2)
+
+        self._weights_3 *= -1 * (weight_change_error_l3 * self._learning_rate)
+        self._biases_3 *= -1 * (bias_change_error_l3 * self._learning_rate)
+        self._weights_2 *= -1 * (weight_change_error_l2 * self._learning_rate)
+        self._biases_2 *= -1 * (bias_change_error_l2 * self._learning_rate)
+
+
+
         # FIXME week 7
 
     def train(self, epochs=100, verbose=0):
@@ -130,7 +169,7 @@ class NeuralNetwork:
 
     def loss(self):
         """ Calculate the MSE error for the set of training data."""
-        return np.mean(np.square(self.get_binary_output() - self._y))
+        return np.mean(np.square(self._output - self._y))
 
     def accuracy_precision(self):
         """accuracy = Total correct prediction / total num predication.
