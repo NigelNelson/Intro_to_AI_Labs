@@ -129,23 +129,25 @@ class NeuralNetwork:
         DL/DB only needs to be calculated for layers. dldw is matrix, dl/db is array
         store z and a values
         """
+        # print("zl3 shape:", self._z_l3_values.shape)
+        # print("zl2 shape:", self._a_l2_values.shape)
         error_l3 = np.multiply((self._output - self._y),
                                sigmoid_derivative(self._z_l3_values))
         error_l2 = np.multiply(
-            np.dot(np.transpose(self._weights_3), error_l3),
+            np.dot(self._weights_3.T, error_l3),
             sigmoid_derivative(self._z_l2_values))
 
-        print("error l3 shape:", error_l3.shape)
-        print("error l2 shape:", error_l2.shape)
+        # print("error l3 shape:", error_l3.shape)
+        # print("error l2 shape:", error_l2.shape)
 
         bias_change_error_l3 = error_l3
         bias_change_error_l2 = error_l2
 
-        print("l3  a shape:", self._a_l2_values.shape)
-        print("input  a shape:", self._a_1.shape)
+        # print("l3  a shape:", self._a_l2_values.shape)
+        # print("input  a shape:", self._a_1.shape)
 
-        weight_change_error_l3 = np.dot(self._a_l2_values, error_l3)
-        weight_change_error_l2 = np.dot(self._a_1, error_l2)
+        weight_change_error_l3 = np.dot(error_l3, self._a_l2_values.T)
+        weight_change_error_l2 = np.dot(error_l2, self._a_1.T)
 
         self._weights_3 *= -1 * (weight_change_error_l3 * self._learning_rate)
         self._biases_3 *= -1 * (bias_change_error_l3 * self._learning_rate)
