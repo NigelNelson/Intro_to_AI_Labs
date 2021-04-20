@@ -57,7 +57,7 @@ class NeuralNetwork:
         #                             [1.92454886],
         #                             [-5.20663292],
         #                             [3.21598943]])
-        self._biases_2 = np.random.rand(num_hidden_neurons)
+        self._biases_2 = np.random.rand(num_hidden_neurons, 1)
         # self._biases_2 = np.array([-1.26285168, -0.72768134, 0.89760201,
         #                            -1.10572122])
         self._biases_3 = np.random.rand(1)
@@ -146,8 +146,8 @@ class NeuralNetwork:
         bias_change_error_l2 = error_l2
 
 
-        weight_change_error_l3 = np.dot(error_l3.T ,self._a_l2_values)
-        weight_change_error_l2 = np.dot(error_l2, self._a_1)
+        weight_change_error_l3 = np.dot(error_l3 ,self._a_l2_values.T)
+        weight_change_error_l2 = np.dot(error_l2, self._a_1.T)
 
         print("weight change error l3 shape:", weight_change_error_l3.shape)
         print("weight change error l2 shape:", weight_change_error_l2.shape)
