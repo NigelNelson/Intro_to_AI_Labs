@@ -46,7 +46,7 @@ def test_or_nn(verbose=0):
     assert nn.loss() < .04
 
 def test_ttt_nn(verbose=0):
-    x, y = load_tictactoe_csv("tic-tac-toe-1.csv")
+    x, y = load_tictactoe_csv("tic-tac-toe.csv")
     nn = NeuralNetwork(x, y, 4, .1)
     nn.load_4_layer_ttt_network()
     nn.feedforward()

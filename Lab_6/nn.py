@@ -43,8 +43,8 @@ class NeuralNetwork:
         """Setup a Neural Network with a single hidden layer.  This method
         requires two vectors of x and y values as the input and output data.
         """
-        # FIXME week 7
-        print("input shape is", x.shape)
+        # # FIXME week 7
+        # print("input shape is", x.shape)
         self._a_1 = x
         self._weights_2 = np.random.rand(x.shape[1], num_hidden_neurons)
 
@@ -57,7 +57,7 @@ class NeuralNetwork:
         #                             [1.92454886],
         #                             [-5.20663292],
         #                             [3.21598943]])
-        self._biases_2 = np.random.rand(num_hidden_neurons, 1)
+        self._biases_2 = np.random.rand(num_hidden_neurons)
         # self._biases_2 = np.array([-1.26285168, -0.72768134, 0.89760201,
         #                            -1.10572122])
         self._biases_3 = np.random.rand(1)
@@ -69,6 +69,10 @@ class NeuralNetwork:
         self._a_l2_values = np.zeros((x.shape[0], num_hidden_neurons))
         self._z_l3_values = np.zeros((x.shape[0], 1))
         # self._a_l2_values = np.zeros(x.shape[0], 1)
+        # print("bias 2 shape :", self._biases_2.shape)
+        # print("bias 3 shape :", self._biases_3.shape)
+        # print("weight 2 shape :", self._weights_2.shape)
+        # print("weight 3 shape :", self._weights_3.shape)
 
     def load_4_layer_ttt_network(self):
         self._weights_2 = np.array([[-3.12064667, -0.62044264, -3.18868069,
@@ -106,7 +110,7 @@ class NeuralNetwork:
         self._a_l2_values = sigmoid(self._z_l2_values)
         self._z_l3_values = np.dot(self._a_l2_values,
                                    self._weights_3) + self._biases_3
-        print("output shape is:", self._z_l3_values.shape)
+        # print("output shape is:", self._z_l3_values.shape)
         return sigmoid(self._z_l3_values)
 
     def feedforward(self):
@@ -130,41 +134,36 @@ class NeuralNetwork:
         DL/DB only needs to be calculated for layers. dldw is matrix, dl/db is array
         store z and a values
         """
-        print("zl3 shape:", self._z_l3_values.shape)
-        print("zl2 shape:", self._a_l2_values.shape)
+        # print("zl3 shape:", self._z_l3_values.shape)
+        # print("zl2 shape:", self._a_l2_values.shape)
 
         error_l3 = (self._output - self._y) * sigmoid_derivative(
             self._z_l3_values)
-        error_l2 = np.dot(self._weights_3.T, error_l3) * sigmoid_derivative(
+        error_l2 = np.dot(error_l3, self._weights_3.T) * sigmoid_derivative(
             self._z_l2_values)
 
 
-        print("error l3 shape:", error_l3.shape)
-        print("error l2 shape:", error_l2.shape)
+        # print("error l3 shape:", error_l3.shape)
+        # print("error l2 shape:", error_l2.shape)
 
         bias_change_error_l3 = error_l3
         bias_change_error_l2 = error_l2
 
 
-        weight_change_error_l3 = np.dot(error_l3 ,self._a_l2_values.T)
-        weight_change_error_l2 = np.dot(error_l2, self._a_1.T)
+        weight_change_error_l3 = np.dot(self._a_l2_values.T, error_l3)
+        weight_change_error_l2 = np.dot(self._a_1.T, error_l2)
 
-        print("weight change error l3 shape:", weight_change_error_l3.shape)
-        print("weight change error l2 shape:", weight_change_error_l2.shape)
-        print("bias change error l3 shape:", bias_change_error_l3.shape)
-        print("bias change error l2 shape:", bias_change_error_l2.shape)
-
-
+        # print("weight change error l3 shape:", weight_change_error_l3.shape)
+        # print("weight change error l2 shape:", weight_change_error_l2.shape)
+        # print("bias change error l3 shape:", bias_change_error_l3.shape)
+        # print("bias change error l2 shape:", bias_change_error_l2.shape)
 
 
 
-        print("l2  a shape:", self._a_l2_values.shape)
-
-
-        self._weights_3 *= -1 * (weight_change_error_l3 * self._learning_rate).sum(axis = 1)
-        self._biases_3 *= -1 * (bias_change_error_l3 * self._learning_rate).sum(axis = 0)
-        self._weights_2 *= -1 * (weight_change_error_l2 * self._learning_rate).sum(axis = 1)
-        self._biases_2 *= -1 * (bias_change_error_l2 * self._learning_rate).sum(axis = 1)
+        self._weights_3 += -1 * (weight_change_error_l3 * self._learning_rate)
+        self._biases_3 += -1 * (bias_change_error_l3 * self._learning_rate).sum(axis = 0)
+        self._weights_2 += -1 * (weight_change_error_l2 * self._learning_rate)
+        self._biases_2 += -1 * (bias_change_error_l2 * self._learning_rate).sum(axis = 0)
 
         # self._weights_3 = [w - (self._learning_rate/self._a_1.shape[0]*nw)
         #                   for w, nw in zip(self._weights_3, weight_change_error_l3.sum(axis=1))]
@@ -175,10 +174,10 @@ class NeuralNetwork:
         #                                     weight_change_error_l2.sum(
         #                                         axis=1))]
 
-        print("biases 3 shape", self._biases_3.shape)
-        print("biases 2 shape", self._biases_2.shape)
-        print("weight 3 shape:",self._weights_3.shape)
-        print("weight 2 shape:", self._weights_2.shape)
+        # print("biases 3 shape", self._biases_3.shape)
+        # print("biases 2 shape", self._biases_2.shape)
+        # print("weight 3 shape:",self._weights_3.shape)
+        # print("weight 2 shape:", self._weights_2.shape)
 
 
 
