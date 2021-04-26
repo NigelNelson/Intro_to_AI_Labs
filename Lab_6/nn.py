@@ -1,7 +1,7 @@
 #
-# nn.py: Basic Neural Network implementation stub.  
-# You will fill out the stubs below using numpy as much as possible.  
-# This class serves as a base for you to build on for the labs.
+# nn.py: Neural Network implementation that utilizes
+# numpy matrices and arrays to implement forward propagation
+# and backpropagation.
 #
 # Lab 6: Neural Networks
 # Date: 4/15/21
@@ -43,36 +43,17 @@ class NeuralNetwork:
         """Setup a Neural Network with a single hidden layer.  This method
         requires two vectors of x and y values as the input and output data.
         """
-        # # FIXME week 7
-        # print("input shape is", x.shape)
         self._a_1 = x
         self._weights_2 = np.random.rand(x.shape[1], num_hidden_neurons)
-
-        # self._weights_2 = np.array([[3.07153357, 2.01940447, -2.14695621,
-        #                              2.62044111],
-        #                             [2.83203743, 2.15003442, -2.16855273,
-        #                              2.77165525]])
         self._weights_3 = np.random.rand(num_hidden_neurons, 1)
-        # self._weights_3 = np.array([[3.8124126],
-        #                             [1.92454886],
-        #                             [-5.20663292],
-        #                             [3.21598943]])
         self._biases_2 = np.random.rand(num_hidden_neurons)
-        # self._biases_2 = np.array([-1.26285168, -0.72768134, 0.89760201,
-        #                            -1.10572122])
         self._biases_3 = np.random.rand(1)
-        # self._biases_3 = np.array([-2.1110666])
         self._y = y
         self._output = np.zeros(self._y.shape)
         self._learning_rate = lr
         self._z_l2_values = np.zeros((x.shape[0], num_hidden_neurons))
         self._a_l2_values = np.zeros((x.shape[0], num_hidden_neurons))
         self._z_l3_values = np.zeros((x.shape[0], 1))
-        # self._a_l2_values = np.zeros(x.shape[0], 1)
-        # print("bias 2 shape :", self._biases_2.shape)
-        # print("bias 3 shape :", self._biases_3.shape)
-        # print("weight 2 shape :", self._weights_2.shape)
-        # print("weight 3 shape :", self._weights_3.shape)
 
     def load_4_layer_ttt_network(self):
         self._weights_2 = np.array([[-3.12064667, -0.62044264, -3.18868069,
@@ -105,12 +86,10 @@ class NeuralNetwork:
         """
         Uses sigmoid activation function applied to the input * weights + bias
         """
-
         self._z_l2_values = np.dot(self._a_1, self._weights_2) + self._biases_2
         self._a_l2_values = sigmoid(self._z_l2_values)
         self._z_l3_values = np.dot(self._a_l2_values,
                                    self._weights_3) + self._biases_3
-        # print("output shape is:", self._z_l3_values.shape)
         return sigmoid(self._z_l3_values)
 
     def feedforward(self):
@@ -118,6 +97,15 @@ class NeuralNetwork:
         This is used in the training process to calculate and save the
         outputs for backpropogation calculations.
         """
+        self._output = self.inference()
+
+    def test_feedforward(self, test_x, test_y):
+        """
+        This is used to pass validation data through a network that has been
+        trained on a subset of a complete dataset.
+        """
+        self._a_1 = test_x
+        self._y = test_y
         self._output = self.inference()
 
     def get_binary_output(self):
@@ -131,57 +119,35 @@ class NeuralNetwork:
         """
         Update model weights based on the error between the most recent
         predictions (feedforward) and the training values.
-        DL/DB only needs to be calculated for layers. dldw is matrix, dl/db is array
+        DL/DB only needs to be calculated for layers.
+        dldw is matrix, dl/db is array
         store z and a values
         """
-        # print("zl3 shape:", self._z_l3_values.shape)
-        # print("zl2 shape:", self._a_l2_values.shape)
-
-        error_l3 = (self._output - self._y) * sigmoid_derivative(
+        # Calculating the delta error for the final layer
+        # shape = (num input columns, 1)
+        delta_error_l3 = (self._output - self._y) * sigmoid_derivative(
             self._z_l3_values)
-        error_l2 = np.dot(error_l3, self._weights_3.T) * sigmoid_derivative(
+        # Calculating the delta error for the hidden layer
+        # shape = (num input columns, num nodes in hidden layer)
+        delta_error_l2 = np.dot(delta_error_l3,
+                                self._weights_3.T) * sigmoid_derivative(
             self._z_l2_values)
-
-
-        # print("error l3 shape:", error_l3.shape)
-        # print("error l2 shape:", error_l2.shape)
-
-        bias_change_error_l3 = error_l3
-        bias_change_error_l2 = error_l2
-
-
-        weight_change_error_l3 = np.dot(self._a_l2_values.T, error_l3)
-        weight_change_error_l2 = np.dot(self._a_1.T, error_l2)
-
-        # print("weight change error l3 shape:", weight_change_error_l3.shape)
-        # print("weight change error l2 shape:", weight_change_error_l2.shape)
-        # print("bias change error l3 shape:", bias_change_error_l3.shape)
-        # print("bias change error l2 shape:", bias_change_error_l2.shape)
-
-
-
-        self._weights_3 += -1 * (weight_change_error_l3 * self._learning_rate)
-        self._biases_3 += -1 * (bias_change_error_l3 * self._learning_rate).sum(axis = 0)
-        self._weights_2 += -1 * (weight_change_error_l2 * self._learning_rate)
-        self._biases_2 += -1 * (bias_change_error_l2 * self._learning_rate).sum(axis = 0)
-
-        # self._weights_3 = [w - (self._learning_rate/self._a_1.shape[0]*nw)
-        #                   for w, nw in zip(self._weights_3, weight_change_error_l3.sum(axis=1))]
-        #
-        #
-        # self._weights_2 = [w - (self._learning_rate / self._a_1.shape[0] * nw)
-        #                    for w, nw in zip(self._weights_2,
-        #                                     weight_change_error_l2.sum(
-        #                                         axis=1))]
-
-        # print("biases 3 shape", self._biases_3.shape)
-        # print("biases 2 shape", self._biases_2.shape)
-        # print("weight 3 shape:",self._weights_3.shape)
-        # print("weight 2 shape:", self._weights_2.shape)
-
-
-
-        # FIXME week 7
+        # Final Layer delta bias error
+        delta_bias_error_l3 = delta_error_l3.sum(axis=0)
+        # Hidden Layer delta bias error
+        delta_bias_error_l2 = delta_error_l2.sum(axis=0)
+        # Final layer delta weight error
+        # shape = (Num nodes in hidden layer, 1)
+        delta_weight_error_l3 = np.dot(self._a_l2_values.T, delta_error_l3)
+        # Hidden layer delta weight error
+        # shape = (Num elements in a input row, Num nodes in hidden layer)
+        delta_weight_error_l2 = np.dot(self._a_1.T, delta_error_l2)
+        # Updating final layer weights and biases
+        self._weights_3 += -1 * (delta_weight_error_l3 * self._learning_rate)
+        self._biases_3 += -1 * (delta_bias_error_l3 * self._learning_rate)
+        # Updating hidden layer weights and biases
+        self._weights_2 += -1 * (delta_weight_error_l2 * self._learning_rate)
+        self._biases_2 += -1 * (delta_bias_error_l2 * self._learning_rate)
 
     def train(self, epochs=100, verbose=0):
         """This method trains the network for the given number of epochs.
@@ -202,6 +168,9 @@ class NeuralNetwork:
         """accuracy = Total correct prediction / total num predication.
         Precision = True positives / all positives"""
         accuracy = (self.get_binary_output() == self._y).sum() / self._y.size
-        precision = ((self.get_binary_output() +
-                      self._y) == 2).sum() / self.get_binary_output().sum()
+        if self.get_binary_output().sum() == 0:
+            precision = 0.0
+        else:
+            precision = ((self.get_binary_output() +
+                          self._y) == 2).sum() / self.get_binary_output().sum()
         return accuracy, precision
